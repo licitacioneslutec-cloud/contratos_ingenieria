@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sincronización LUTEC</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background-color: #162a3f; /* Azul oscuro corporativo */
+            margin: 0; 
+        }
+        .container { 
+            text-align: center; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3); 
+            max-width: 400px;
+            width: 100%;
+        }
+        .logo {
+            max-width: 220px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #162a3f;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #555;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+        button { 
+            background-color: #83b74f; /* Verde corporativo */
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            font-size: 16px; 
+            font-weight: bold;
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        button:hover { 
+            background-color: #6a953d; 
+        }
+        button:disabled { 
+            background-color: #cccccc; 
+            cursor: not-allowed; 
+        }
+        #status { 
+            margin-top: 20px; 
+            font-weight: bold; 
+            font-size: 14px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="grupolutec_logo.jpg" alt="Logo Grupo Lutec" class="logo">
+    
+    <h2>Sincronización Manual</h2>
+    <p>Ejecuta la actualización de facturas y contratos en los tableros de Monday.</p>
+    
+    <button id="btnEjecutar" onclick="ejecutarFlujo()">Sincronizar Ahora</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    async function ejecutarFlujo() {
+        const btn = document.getElementById('btnEjecutar');
+        const statusDiv = document.getElementById('status');
+        
+        // URL actualizada apuntando a tu n8n en la nube
+        const webhookUrl = 'https://licitaciones3.app.n8n.cloud/webhook/contratos/ingenieria'; 
+
+        btn.disabled = true;
+        statusDiv.innerText = "Conectando con n8n...";
+        statusDiv.style.color = "#162a3f";
+
+        try {
+            // Se cambió el método a GET para coincidir con el Webhook
+            const response = await fetch(webhookUrl, {
+                method: 'GET'
+            });
+
+            if (response.ok) {
+                statusDiv.innerText = "¡Sincronización completada con éxito!";
+                statusDiv.style.color = "#83b74f";
+            } else {
+                statusDiv.innerText = "Error: El flujo no pudo ejecutarse.";
+                statusDiv.style.color = "red";
+            }
+        } catch (error) {
+            statusDiv.innerText = "Error de red. Revisa los permisos CORS en n8n.";
+            statusDiv.style.color = "red";
+        } finally {
+            setTimeout(() => { 
+                btn.disabled = false; 
+                statusDiv.innerText = "";
+            }, 5000);
+        }
+    }
+</script>
+
+</body>
+</html>
